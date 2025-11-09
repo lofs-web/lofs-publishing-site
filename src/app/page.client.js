@@ -5,7 +5,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(""); // "" | "bespoke" | "sync"
   const [activeImage, setActiveImage] = useState("");
   const [activeBio, setActiveBio] = useState("");
-  const [activeMobileComposer, setActiveMobileComposer] = useState(null);
+  const [activeComposer, setActiveComposer] = useState(null);
 
   const bespokeComposers = [
     { 
@@ -64,20 +64,21 @@ export default function Home() {
     },
   ];
 
-  // Preload all images
+  // Preload images
   useEffect(() => {
     bespokeComposers.forEach(item => new Image().src = item.img);
   }, []);
 
-  // Reset page
   const resetPage = () => {
     setActiveTab("");
     setActiveImage("");
     setActiveBio("");
-    setActiveMobileComposer(null);
+    setActiveComposer(null);
   };
 
-  // Smooth scroll function for iframe
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  // Smooth scroll to iframe
   const slowScrollTo = (element, duration = 2500) => {
     if (!element) return;
     const target = element.getBoundingClientRect().top + window.scrollY;
@@ -118,14 +119,16 @@ export default function Home() {
         <p className="cursor-default">
           <span
             className="hover:underline cursor-pointer lowercase"
-            onMouseEnter={() => setActiveTab("bespoke")}
+            onMouseEnter={() => { if (!isMobile) setActiveTab("bespoke"); setActiveImage(""); setActiveBio(""); }}
+            onClick={() => setActiveTab("bespoke")}
           >
             bespoke composers
           </span>
           {" · "}
           <span
             className="hover:underline cursor-pointer lowercase"
-            onMouseEnter={() => setActiveTab("sync")}
+            onMouseEnter={() => !isMobile && setActiveTab("sync")}
+            onClick={() => setActiveTab("sync")}
           >
             sync sampler
           </span>
@@ -133,58 +136,56 @@ export default function Home() {
       </div>
 
       {/* Flower */}
-      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2">
-        <img src="/publishingflower.png" alt="flower" className="w-64" />
+      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 pointer-events-none">
+        <img src="/publishingflower.png" alt="flower" className="w-64 opacity-90" />
       </div>
 
-      {/* Bespoke Composers */}
+      {/* BESPOKE COMPOSERS */}
       {activeTab === "bespoke" && (
         <>
-          <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 w-[40rem] md:w-full px-4 md:px-0">
-            <ul className="text-center text-sm space-y-1">
-              {bespokeComposers.map((member, index) => (
-                <li key={index} className="whitespace-nowrap">
-                  <span
-                    className="cursor-pointer hover:opacity-60 transition"
-                    onMouseEnter={() => { if (window.innerWidth >= 768) { setActiveImage(member.img); setActiveBio(member.bio); } }}
-                    onClick={() => { if (window.innerWidth < 768) setActiveMobileComposer(member); }}
-                  >
-                    {member.name}
-                  </span>
+          {/* Composer List */}
+          {!activeComposer && (
+            <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 w-[90%] md:w-[40rem] px-4 md:px-0">
+              <ul className="text-center text-sm space-y-1">
+                {bespokeComposers.map((member, index) => (
+                  <li key={index} className="whitespace-nowrap">
+                    <span
+                      className="cursor-pointer hover:opacity-60 transition"
+                      onMouseEnter={() => { if (!isMobile) { setActiveImage(member.img); setActiveBio(member.bio); } }}
+                      onClick={() => { if (isMobile) setActiveComposer(member); }}
+                    >
+                      {member.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-                  {/* Mobile pop-up card */}
-                  {activeMobileComposer === member && window.innerWidth < 768 && (
-                    <div className="md:hidden fixed top-0 left-0 w-full h-screen overflow-auto bg-white z-50 p-4">
-                      <button
-                        className="text-xs mb-2 hover:underline"
-                        onClick={() => setActiveMobileComposer(null)}
-                      >
-                        ← Close
-                      </button>
-                      <img src={member.img} alt={member.name} className="w-full rounded-lg mb-2" />
-                      <p className="text-xs mb-2">{member.bio}</p>
-                      <a href={member.link} target="_blank" rel="noopener noreferrer" className="text-xs block mb-1 hover:underline">more</a>
-                      <a href="mailto:lofspublishing@gmail.com" className="text-xs block hover:underline">contact</a>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Desktop right-side image */}
-          {activeImage && window.innerWidth >= 768 && (
+          {/* Desktop hover bio */}
+          {!isMobile && activeImage && (
             <div className="absolute top-20 right-20 text-right max-w-xs hidden md:block">
               <img src={activeImage} alt="artist" className="w-72 rounded-lg transition-all duration-300" />
-              {activeBio && <p className="mt-2 text-xs">{activeBio}</p>}
+              <p className="mt-2 text-xs">{activeBio}</p>
               <a href={bespokeComposers.find(m => m.img === activeImage)?.link || "#"} target="_blank" rel="noopener noreferrer" className="text-xs block mt-1 hover:underline">more</a>
+              <a href="mailto:lofspublishing@gmail.com" className="text-xs block mt-1 hover:underline">contact</a>
+            </div>
+          )}
+
+          {/* Mobile full-width card */}
+          {isMobile && activeComposer && (
+            <div className="fixed inset-0 bg-white z-50 p-6 overflow-auto">
+              <button className="text-xs mb-4 underline" onClick={() => setActiveComposer(null)}>✕ close</button>
+              <img src={activeComposer.img} alt={activeComposer.name} className="w-full rounded-lg mb-4" />
+              <p className="text-xs mb-2">{activeComposer.bio}</p>
+              <a href={activeComposer.link} target="_blank" rel="noopener noreferrer" className="text-xs block mt-1 hover:underline">more</a>
               <a href="mailto:lofspublishing@gmail.com" className="text-xs block mt-1 hover:underline">contact</a>
             </div>
           )}
         </>
       )}
 
-      {/* Sync Sampler */}
+      {/* SYNC SAMPLER */}
       <div className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${activeTab === "sync" ? "opacity-100" : "opacity-0"}`}>
         <div className="max-w-full overflow-hidden">
           <iframe
