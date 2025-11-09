@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState(""); // "" | "bespoke" | "sync"
   const [activeImage, setActiveImage] = useState("");
   const [activeBio, setActiveBio] = useState("");
-  const syncRef = useRef(null);
+  const [activeComposer, setActiveComposer] = useState(null);
 
   const bespokeComposers = [
     { 
@@ -72,21 +72,15 @@ export default function Home() {
     });
   }, []);
 
-  // Scroll Sync Sampler into view when opened (mobile only)
-  useEffect(() => {
-    if (activeTab === "sync" && syncRef.current && window.innerWidth < 768) {
-      setTimeout(() => {
-        syncRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    }
-  }, [activeTab]);
-
   // Reset page
   const resetPage = () => {
     setActiveTab("");
     setActiveImage("");
     setActiveBio("");
+    setActiveComposer(null);
   };
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <main className="bg-white text-gray-700 min-h-screen font-mono relative">
@@ -99,17 +93,21 @@ export default function Home() {
           <span
             className="hover:underline cursor-pointer lowercase"
             onMouseEnter={() => {
-              setActiveTab("bespoke");
-              setActiveImage(""); // reset image
-              setActiveBio("");   // reset bio
+              if (!isMobile) {
+                setActiveTab("bespoke");
+                setActiveImage("");
+                setActiveBio("");
+              }
             }}
+            onClick={() => setActiveTab("bespoke")}
           >
             bespoke composers
           </span>
           {" · "}
           <span
             className="hover:underline cursor-pointer lowercase"
-            onMouseEnter={() => setActiveTab("sync")}
+            onMouseEnter={() => !isMobile && setActiveTab("sync")}
+            onClick={() => setActiveTab("sync")}
           >
             sync sampler
           </span>
@@ -117,32 +115,41 @@ export default function Home() {
       </div>
 
       {/* Flower */}
-      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2">
-        <img src="/publishingflower.png" alt="flower" className="w-64" />
+      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 pointer-events-none">
+        <img src="/publishingflower.png" alt="flower" className="w-64 opacity-90" />
       </div>
 
-      {/* Bespoke Composers list */}
+      {/* BESPOKE COMPOSERS */}
       {activeTab === "bespoke" && (
         <>
-          <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 w-[40rem]">
-            <ul className="text-center text-sm space-y-1">
-              {bespokeComposers.map((member, index) => (
-                <li key={index} className="whitespace-nowrap">
-                  <span
-                    className="cursor-pointer hover:opacity-60 transition"
-                    onMouseEnter={() => {
-                      setActiveImage(member.img);
-                      setActiveBio(member.bio);
-                    }}
-                  >
-                    {member.name}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Composer List (mobile + desktop) */}
+          {!activeComposer && (
+            <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 w-[90%] md:w-[40rem]">
+              <ul className="text-center text-sm space-y-1">
+                {bespokeComposers.map((member, index) => (
+                  <li key={index} className="whitespace-nowrap">
+                    <span
+                      className="cursor-pointer hover:opacity-60 transition"
+                      onMouseEnter={() => {
+                        if (!isMobile) {
+                          setActiveImage(member.img);
+                          setActiveBio(member.bio);
+                        }
+                      }}
+                      onClick={() => {
+                        if (isMobile) setActiveComposer(member);
+                      }}
+                    >
+                      {member.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          {activeImage && (
+          {/* Desktop hover bio */}
+          {!isMobile && activeImage && (
             <div className="absolute top-20 right-20 text-right max-w-xs">
               <img src={activeImage} alt="artist" className="w-72 rounded-lg transition-all duration-300" />
               {activeBio && <p className="mt-2 text-xs">{activeBio}</p>}
@@ -157,23 +164,54 @@ export default function Home() {
               <a href="mailto:lofspublishing@gmail.com" className="text-xs block mt-1 hover:underline">contact</a>
             </div>
           )}
+
+          {/* Mobile full-width card */}
+          {isMobile && activeComposer && (
+            <div className="absolute inset-0 bg-white z-50 p-6 overflow-y-auto">
+              <button
+                className="text-xs mb-4 underline"
+                onClick={() => setActiveComposer(null)}
+              >
+                ✕ close
+              </button>
+              <img
+                src={activeComposer.img}
+                alt={activeComposer.name}
+                className="w-full rounded-lg mb-4"
+              />
+              <p className="text-xs mb-2">{activeComposer.bio}</p>
+              <a
+                href={activeComposer.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs block mt-1 hover:underline"
+              >
+                more
+              </a>
+              <a
+                href="mailto:lofspublishing@gmail.com"
+                className="text-xs block mt-1 hover:underline"
+              >
+                contact
+              </a>
+            </div>
+          )}
         </>
       )}
 
-      {/* Sync Sampler - full width, fills mobile height + auto-scroll */}
+      {/* SYNC SAMPLER */}
       <div
-        ref={syncRef}
-        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 ${
+        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${
           activeTab === "sync" ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="w-full overflow-hidden">
+        <div className="max-w-full overflow-hidden">
           <iframe
             id="disco-playlist-25806701"
             name="disco-playlist-25806701"
             allowFullScreen
             frameBorder="0"
-            className="w-full h-[395px] md:h-[395px] sm:h-[calc(100vh-120px)]"
+            className="disco-embed w-full h-[395px] sm:h-[calc(100vh-100px)]"
             src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
             style={{
               position: activeTab === "sync" ? "static" : "absolute",
@@ -182,7 +220,6 @@ export default function Home() {
           ></iframe>
         </div>
       </div>
-
     </main>
   );
 }
