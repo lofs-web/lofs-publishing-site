@@ -10,7 +10,7 @@ export default function Home() {
     { 
       name: "Daniel Ball", 
       img: "/danielball.jpg", 
-      bio: "Daniel Ball is a producer, DJ and multidisciplinary artist. Spanning commissioned composition for fashion and film, hyperactive dance pop with collaborators Elphi and Aria SL, his music is characterised by an early background in jazz and classical followed by a strong shift towards modern electronic production. Recent production work includes a score Yenesai’s SS25 runway show at the Palais De Tokyo (alongside longtime collaborator Aria SL) and Elphi’s ‘Lullaby’, alongside research into the affective nature of bass music through ending summers.",
+      bio: "Daniel Ball is a producer, DJ and multidisciplinary artist. Spanning commissioned composition for fashion and film, hyperactive dance pop with collaborators Elphi and Aria SL, his music is characterised by an early background in jazz and classical followed by a strong shift towards modern electronic production. Recent production work includes a score Yenesai's SS25 runway show at the Palais De Tokyo (alongside longtime collaborator Aria SL) and Elphi's 'Lullaby', alongside research into the affective nature of bass music through ending summers.",
       link: "https://www.instagram.com/__danielball__/"
     },
     { 
@@ -139,26 +139,28 @@ export default function Home() {
         </>
       )}
 
-      {/* Sync Sampler - preloaded offscreen */}
+      {/* Sync Sampler - full width */}
       <div
-        className={`absolute top-[50%] left-1/2 transform -translate-x-1/2 mt-4 transition-opacity duration-300 ${
+        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${
           activeTab === "sync" ? "opacity-100" : "opacity-0"
         }`}
       >
-        <iframe
-          id="disco-playlist-25806701"
-          name="disco-playlist-25806701"
-          allowFullScreen
-          frameBorder="0"
-          className="disco-embed"
-          src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
-          width="480"
-          height="395"
-          style={{
-            position: activeTab === "sync" ? "static" : "absolute",
-            top: activeTab === "sync" ? "auto" : "-9999px",
-          }}
-        ></iframe>
+        <div className="max-w-full overflow-hidden">
+          <iframe
+            id="disco-playlist-25806701"
+            name="disco-playlist-25806701"
+            allowFullScreen
+            frameBorder="0"
+            className="disco-embed w-full"
+            src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
+            width="100%"
+            height="395"
+            style={{
+              position: activeTab === "sync" ? "static" : "absolute",
+              top: activeTab === "sync" ? "auto" : "-9999px",
+            }}
+          ></iframe>
+        </div>
       </div>
 
     </main>
