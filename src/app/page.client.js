@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState(""); // "" | "bespoke" | "sync"
   const [activeImage, setActiveImage] = useState("");
   const [activeBio, setActiveBio] = useState("");
+  const syncRef = useRef(null);
 
   const bespokeComposers = [
     { 
@@ -70,6 +71,15 @@ export default function Home() {
       img.src = item.img;
     });
   }, []);
+
+  // Scroll Sync Sampler into view when opened (mobile only)
+  useEffect(() => {
+    if (activeTab === "sync" && syncRef.current && window.innerWidth < 768) {
+      setTimeout(() => {
+        syncRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [activeTab]);
 
   // Reset page
   const resetPage = () => {
@@ -150,8 +160,9 @@ export default function Home() {
         </>
       )}
 
-      {/* Sync Sampler - full width, mobile fix */}
+      {/* Sync Sampler - full width, fills mobile height + auto-scroll */}
       <div
+        ref={syncRef}
         className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 ${
           activeTab === "sync" ? "opacity-100" : "opacity-0"
         }`}
