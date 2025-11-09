@@ -117,7 +117,7 @@ useEffect(() => {
 
       {/* Flower */}
       <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2">
-        <img src="/flower.jpg" alt="flower" className="w-64" />
+        <img src="/publishingflower.png" alt="flower" className="w-64" />
       </div>
 
       {/* Releases list */}
