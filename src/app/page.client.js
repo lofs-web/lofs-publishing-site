@@ -71,17 +71,28 @@ export default function Home() {
     });
   }, []);
 
+  // Reset page
+  const resetPage = () => {
+    setActiveTab("");
+    setActiveImage("");
+    setActiveBio("");
+  };
+
   return (
     <main className="bg-white text-gray-700 min-h-screen font-mono relative">
 
       {/* Top-left menu */}
       <div className="absolute top-8 left-8 text-xs flex flex-col space-y-1">
-        <p className="cursor-pointer">✿ LOFS Publishing</p>
+        <p className="cursor-pointer" onClick={resetPage}>✿ LOFS Publishing</p>
 
         <p className="cursor-default">
           <span
             className="hover:underline cursor-pointer lowercase"
-            onMouseEnter={() => setActiveTab("bespoke")}
+            onMouseEnter={() => {
+              setActiveTab("bespoke");
+              setActiveImage(""); // reset image
+              setActiveBio("");   // reset bio
+            }}
           >
             bespoke composers
           </span>
@@ -151,10 +162,8 @@ export default function Home() {
             name="disco-playlist-25806701"
             allowFullScreen
             frameBorder="0"
-            className="disco-embed w-full"
+            className="disco-embed w-full h-[395px] md:h-[395px] sm:h-[calc(100vh-100px)]" // fills mobile screen
             src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
-            width="100%"
-            height="395"
             style={{
               position: activeTab === "sync" ? "static" : "absolute",
               top: activeTab === "sync" ? "auto" : "-9999px",
