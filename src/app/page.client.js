@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState(""); // "" | "bespoke" | "sync"
   const [activeImage, setActiveImage] = useState("");
   const [activeBio, setActiveBio] = useState("");
+  const syncRef = useRef(null);
 
   const bespokeComposers = [
     { 
@@ -71,46 +72,21 @@ export default function Home() {
     });
   }, []);
 
+  // Scroll Sync Sampler into view when opened (mobile only)
+  useEffect(() => {
+    if (activeTab === "sync" && syncRef.current && window.innerWidth < 768) {
+      setTimeout(() => {
+        syncRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [activeTab]);
+
   // Reset page
   const resetPage = () => {
     setActiveTab("");
     setActiveImage("");
     setActiveBio("");
   };
-
-  // Slow scroll function
-  const slowScrollTo = (element, duration = 1500) => {
-    if (!element) return;
-    const targetPosition = element.getBoundingClientRect().top + window.scrollY;
-    const startPosition = window.scrollY;
-    const distance = targetPosition - startPosition;
-    let startTime = null;
-
-    const easeInOutQuad = (t, b, c, d) => {
-      t /= d / 2;
-      if (t < 1) return c / 2 * t * t + b;
-      t--;
-      return -c / 2 * (t * (t - 2) - 1) + b;
-    };
-
-    const animation = (currentTime) => {
-      if (!startTime) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-      window.scrollTo(0, run);
-      if (timeElapsed < duration) requestAnimationFrame(animation);
-    };
-
-    requestAnimationFrame(animation);
-  };
-
-  // Auto-scroll to sync sampler
-  useEffect(() => {
-    if (activeTab === "sync") {
-      const iframe = document.getElementById("disco-playlist-25806701");
-      slowScrollTo(iframe, 1500); // 1500ms slow scroll
-    }
-  }, [activeTab]);
 
   return (
     <main className="bg-white text-gray-700 min-h-screen font-mono relative">
@@ -124,8 +100,8 @@ export default function Home() {
             className="hover:underline cursor-pointer lowercase"
             onMouseEnter={() => {
               setActiveTab("bespoke");
-              setActiveImage(""); 
-              setActiveBio("");   
+              setActiveImage(""); // reset image
+              setActiveBio("");   // reset bio
             }}
           >
             bespoke composers
@@ -184,19 +160,20 @@ export default function Home() {
         </>
       )}
 
-      {/* Sync Sampler - full width */}
+      {/* Sync Sampler - full width, fills mobile height + auto-scroll */}
       <div
-        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${
+        ref={syncRef}
+        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 ${
           activeTab === "sync" ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="max-w-full overflow-hidden">
+        <div className="w-full overflow-hidden">
           <iframe
             id="disco-playlist-25806701"
             name="disco-playlist-25806701"
             allowFullScreen
             frameBorder="0"
-            className="disco-embed w-full h-[395px] sm:h-[calc(100vh-100px)]"
+            className="w-full h-[395px] md:h-[395px] sm:h-[calc(100vh-120px)]"
             src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
             style={{
               position: activeTab === "sync" ? "static" : "absolute",
