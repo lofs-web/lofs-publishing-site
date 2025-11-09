@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "LOFS",
-  description: "LOFS",
+  title: "LOFS Publishing",
+  description: "LOFS Publishing",
   icons: {
     icon: "/lofsfaviconv2.ico", // still keeps Next.js metadata aware
   },

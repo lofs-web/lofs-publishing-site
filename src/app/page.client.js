@@ -83,7 +83,7 @@ useEffect(() => {
             setActivePlayer("");
           }}
         >
-          ✿ LOFS
+          ✿ LOFS Publishing
         </p>
 
         <p className="cursor-default">
