@@ -150,19 +150,19 @@ export default function Home() {
         </>
       )}
 
-      {/* Sync Sampler - full width */}
+      {/* Sync Sampler - full width, mobile fix */}
       <div
-        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${
+        className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 ${
           activeTab === "sync" ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="max-w-full overflow-hidden">
+        <div className="w-full overflow-hidden">
           <iframe
             id="disco-playlist-25806701"
             name="disco-playlist-25806701"
             allowFullScreen
             frameBorder="0"
-            className="disco-embed w-full h-[395px] md:h-[395px] sm:h-[calc(100vh-100px)]" // fills mobile screen
+            className="w-full h-[395px] md:h-[395px] sm:h-[calc(100vh-120px)]"
             src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
             style={{
               position: activeTab === "sync" ? "static" : "absolute",
