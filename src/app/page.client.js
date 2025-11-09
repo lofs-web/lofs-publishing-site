@@ -6,7 +6,6 @@ export default function Home() {
   const [activeImage, setActiveImage] = useState("");
   const [activeBio, setActiveBio] = useState("");
   const [activeMobileComposer, setActiveMobileComposer] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   const bespokeComposers = [
     { 
@@ -65,11 +64,6 @@ export default function Home() {
     },
   ];
 
-  // Detect mobile once
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-  }, []);
-
   // Preload all images
   useEffect(() => {
     bespokeComposers.forEach(item => new Image().src = item.img);
@@ -83,13 +77,44 @@ export default function Home() {
     setActiveMobileComposer(null);
   };
 
+  // Smooth scroll function for iframe
+  const slowScrollTo = (element, duration = 2500) => {
+    if (!element) return;
+    const target = element.getBoundingClientRect().top + window.scrollY;
+    const start = window.scrollY;
+    const distance = target - start;
+    let startTime = null;
+
+    const easeInOut = (t, b, c, d) => {
+      t /= d / 2;
+      if (t < 1) return c / 2 * t * t + b;
+      t--;
+      return -c / 2 * (t * (t - 2) - 1) + b;
+    };
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      window.scrollTo(0, easeInOut(elapsed, start, distance, duration));
+      if (elapsed < duration) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    if (activeTab === "sync") {
+      const iframe = document.getElementById("disco-playlist-25806701");
+      slowScrollTo(iframe);
+    }
+  }, [activeTab]);
+
   return (
     <main className="bg-white text-gray-700 min-h-screen font-mono relative">
 
       {/* Top-left menu */}
       <div className="absolute top-8 left-8 text-xs flex flex-col space-y-1 z-50">
         <p className="cursor-pointer" onClick={resetPage}>✿ LOFS Publishing</p>
-
         <p className="cursor-default">
           <span
             className="hover:underline cursor-pointer lowercase"
@@ -112,7 +137,7 @@ export default function Home() {
         <img src="/publishingflower.png" alt="flower" className="w-64" />
       </div>
 
-      {/* Bespoke Composers list */}
+      {/* Bespoke Composers */}
       {activeTab === "bespoke" && (
         <>
           <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 w-[40rem] md:w-full px-4 md:px-0">
@@ -121,15 +146,15 @@ export default function Home() {
                 <li key={index} className="whitespace-nowrap">
                   <span
                     className="cursor-pointer hover:opacity-60 transition"
-                    onMouseEnter={() => { if (!isMobile) { setActiveImage(member.img); setActiveBio(member.bio); } }}
-                    onClick={() => { if (isMobile) setActiveMobileComposer(member); }}
+                    onMouseEnter={() => { if (window.innerWidth >= 768) { setActiveImage(member.img); setActiveBio(member.bio); } }}
+                    onClick={() => { if (window.innerWidth < 768) setActiveMobileComposer(member); }}
                   >
                     {member.name}
                   </span>
 
                   {/* Mobile pop-up card */}
-                  {activeMobileComposer === member && isMobile && (
-                    <div className="md:hidden mt-2 bg-white p-4 rounded-lg shadow-lg text-left w-full fixed top-0 left-0 h-screen overflow-auto z-50">
+                  {activeMobileComposer === member && window.innerWidth < 768 && (
+                    <div className="md:hidden fixed top-0 left-0 w-full h-screen overflow-auto bg-white z-50 p-4">
                       <button
                         className="text-xs mb-2 hover:underline"
                         onClick={() => setActiveMobileComposer(null)}
@@ -148,7 +173,7 @@ export default function Home() {
           </div>
 
           {/* Desktop right-side image */}
-          {activeImage && !isMobile && (
+          {activeImage && window.innerWidth >= 768 && (
             <div className="absolute top-20 right-20 text-right max-w-xs hidden md:block">
               <img src={activeImage} alt="artist" className="w-72 rounded-lg transition-all duration-300" />
               {activeBio && <p className="mt-2 text-xs">{activeBio}</p>}
@@ -159,7 +184,7 @@ export default function Home() {
         </>
       )}
 
-      {/* Sync Sampler - full width, mobile-friendly */}
+      {/* Sync Sampler */}
       <div className={`absolute top-[50%] left-0 w-full transform mt-4 transition-opacity duration-300 px-4 md:px-0 ${activeTab === "sync" ? "opacity-100" : "opacity-0"}`}>
         <div className="max-w-full overflow-hidden">
           <iframe
@@ -167,7 +192,7 @@ export default function Home() {
             name="disco-playlist-25806701"
             allowFullScreen
             frameBorder="0"
-            className="disco-embed w-full h-[395px] sm:h-[calc(100vh-100px)] md:h-[395px]"
+            className="disco-embed w-full h-[395px] sm:h-[calc(100vh-100px)]"
             src="https://lofs-publishing.disco.ac/e/p/25806701?download=false&s=zGQtJ_ZvwoX9BevMD_YWGxgIuDA%3ANkOJIzWq&artwork=true&color=%2332B57C&theme=white"
             style={{
               position: activeTab === "sync" ? "static" : "absolute",
