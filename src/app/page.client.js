@@ -40,7 +40,7 @@ export default function Home() {
     },
     { 
       name: "Oshi Moon", 
-      img: "/jabes c.jpg", 
+      img: "/oshisync.jpg", 
       bio: "Underground Pop star Oshi Moon is obsessed with exploring duality through their art, treading the knife's edge of digital and analogue, hard and soft, masculine and feminine. Piecing together discarded fragments of the net, Oshi wields multiple creative disciplines to manifest their latest project CATFLAP.", 
       link: "https://www.instagram.com/oshi_moon/"
     },
